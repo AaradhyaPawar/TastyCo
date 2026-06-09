@@ -1,0 +1,29 @@
+Set-Location -Path 'D:\STUDY\Projects\TASTYCO\Tasty_Co'
+$CATALINA='C:\Users\admin\OneDrive\Documents\apache-tomcat-9.0.118'
+$CP = "$CATALINA\lib\servlet-api.jar;src\main\webapp\WEB-INF\lib\mysql-connector-j-8.0.33.jar;src\main\webapp\WEB-INF\lib\json-20210307.jar"
+New-Item -ItemType Directory -Path build\classes -Force | Out-Null
+$files = Get-ChildItem -Path src\main\java -Recurse -Filter *.java | ForEach-Object { $_.FullName }
+javac -cp $CP -d build\classes $files
+
+
+
+
+
+$DEST = 'C:\Users\admin\OneDrive\Documents\apache-tomcat-9.0.118\webapps\Tasty_Co'
+if (Test-Path $DEST) { Remove-Item -LiteralPath $DEST -Recurse -Force }
+New-Item -ItemType Directory -Path $DEST | Out-Null
+robocopy .\src\main\webapp $DEST /MIR /XF pom.xml /XD WEB-INF\lib | Out-Null
+New-Item -ItemType Directory -Path "$DEST\WEB-INF\classes" -Force | Out-Null
+Copy-Item -Path .\build\classes\* -Destination "$DEST\WEB-INF\classes" -Recurse -Force
+Copy-Item -Path .\src\main\webapp\WEB-INF\lib\* -Destination "$DEST\WEB-INF\lib" -Force
+
+
+Set-Location -Path 'C:\Users\admin\OneDrive\Documents\apache-tomcat-9.0.118\bin'
+.\startup.bat
+
+
+Open the url :   http://localhost:8080/Tasty_Co/
+
+
+Stop : Set-Location -Path 'C:\Users\admin\OneDrive\Documents\apache-tomcat-9.0.118\bin'
+.\shutdown.bat
